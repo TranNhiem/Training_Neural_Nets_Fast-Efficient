@@ -32,7 +32,7 @@ torchvision_dataset={
 
 }
 
-def main(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: int, num_workers: int, 
+def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: int, num_workers: int, 
         chunk_size: int, subset: int, jpeg_quality: float, write_mode: str, compress_probability: float, torchvision_data: bool =False,
         ): 
     '''
@@ -77,7 +77,7 @@ def main(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: i
 
 
 if __name__=="__main__": 
-    
+
     parser= argparse.ArgumentParser()
     ## Dataset Define
     parser.add_argument('--torchvision_data', type=str, default=True,)
@@ -95,7 +95,7 @@ if __name__=="__main__":
     args = parser.parse_args() 
 
     print("Hoooray~~~ You are writing Test CIFAR10 dataset ")
-    main(dataset_dir= args.data_dir, dataset_name=args.dataset_name, write_path=args.write_path, max_resolution=args.max_resolution, num_workers=args.num_workers, 
+    write_ffcv_DATA(dataset_dir= args.data_dir, dataset_name=args.dataset_name, write_path=args.write_path, max_resolution=args.max_resolution, num_workers=args.num_workers, 
         chunk_size=args.chunk_size, subset=args.subset, jpeg_quality=args.jpeg_quality, write_mode=args.write_mode, compress_probability=args.compress_probability, torchvision_data=args.orchvision_data,)
     print("Awesome~~~ Dataset completed --> Please check your folder")
     print("Directory as follow: ", args.data_dir)
