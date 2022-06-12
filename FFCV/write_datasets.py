@@ -77,20 +77,21 @@ def main(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: i
 
 
 if __name__=="__main__": 
+    
     parser= argparse.ArgumentParser()
     ## Dataset Define
-     ""('--torchvision_data', type=str, default=True,)
-     ""('--dataset_name', type=str, default='CIFAR10')
-     ""('--write_path', type=str, default='./FFCV_dataset/CIFAR10/')
-     ""('--data_dir', type=str, default='./CIFAR10/')
-     ""('--write_mode', type=str, default='smart', help='Mode: raw, smart or jpg',)
-     ""('--img_size', type=int, default=32)
-     ""('--num_workers', type=int, default=10)
-     ""('--jpeg_quality', type=float, default=90, help="the quality of jpeg Images")
-     ""('--chunk_size', type=int, default=100, help="Chunck_size for writing Images")
-     ""('--max_resolution', type=int, default=32, help="'Max image side length'")
-     ""('--compress_probability', type=float, default=None, help='compress probability')
-     ""('--subset', help='How many images to use (-1 for all)', default=-1 )
+    parser.add_argument('--torchvision_data', type=str, default=True,)
+    parser.add_argument('--dataset_name', type=str, default='CIFAR10')
+    parser.add_argument('--write_path', type=str, default='./FFCV_dataset/CIFAR10/')
+    parser.add_argument('--data_dir', type=str, default='./CIFAR10/')
+    parser.add_argument('--write_mode', type=str, default='smart', help='Mode: raw, smart or jpg',)
+    parser.add_argument('--img_size', type=int, default=32)
+    parser.add_argument('--num_workers', type=int, default=10)
+    parser.add_argument('--jpeg_quality', type=float, default=90, help="the quality of jpeg Images")
+    parser.add_argument('--chunk_size', type=int, default=100, help="Chunck_size for writing Images")
+    parser.add_argument('--max_resolution', type=int, default=32, help="'Max image side length'")
+    parser.add_argument('--compress_probability', type=float, default=None, help='compress probability')
+    parser.add_argument('--subset', help='How many images to use (-1 for all)', default=-1 )
     args = parser.parse_args() 
 
     print("Hoooray~~~ You are writing Test CIFAR10 dataset ")
