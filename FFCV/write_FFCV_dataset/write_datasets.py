@@ -10,8 +10,10 @@ import argparse
 
 from torchvision import datasets
 from torchvision.datasets import ImageFolder
-from torchvision.utils.data import Subset 
+#from torchvision.utils.data import Subset 
+from torch.utils.data import Subset
 ## Import packages from FFCV 
+import ffcv
 from ffcv.writer import DatasetWriter 
 from ffcv.fields import IntField, RGBImageField 
 
@@ -29,7 +31,6 @@ def checkKey(dict, key):
 torchvision_dataset={
     "CIFAR100": datasets.CIFAR100, 
     "CIFAR10": datasets.CIFAR10,
-
 }
 
 def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: int, num_workers: int, 
@@ -39,7 +40,7 @@ def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_re
     args: 
     ""('--torchvision_data', type=str, default=True,)
      ""('--dataset_name', type=str, default='CIFAR10')
-     ""('--write_path', type=str, default='./FFCV_dataset/CIFAR10/')
+     ""('--write_path', type=str, default='/FFCV_dataset/CIFAR10/')
      ""('--data_dir', type=str, default='./CIFAR10/')
      ""('--write_mode', type=str, default='smart', help='Mode: raw, smart or jpg',)
      ""('--img_size', type=int, default=32)
@@ -48,15 +49,16 @@ def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_re
      ""('--chunk_size', type=int, default=100, help="Chunck_size for writing Images")
      ""('--max_resolution', type=int, default=32, help="'Max image side length'")
      ""('--compress_probability', type=float, default=None, help='compress probability')
+     This option is mostly useful for users who wish to achieve storage/speed trade-offs between jpg and raw
      ""('--subset', help='How many images to use (-1 for all)', default=-1 )
     '''
 
     if not os.path.isdir(dataset_dir):
         print("creat : ", dataset_dir)
         os.makedirs(dataset_dir)
-    if not os.path.isdir(write_path):
-        print("creat : ", write_path)
-        os.makedirs(write_path)
+    # if not os.path.isdir(write_path):
+    #     print("creat : ", write_path)
+    #     os.makedirs(write_path)
     
     if torchvision_data:
         checkKey(torchvision_dataset, dataset_name)
@@ -72,7 +74,7 @@ def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_re
                             num_workers=num_workers,
                             )
 
-    writer.from_indexed_dataset(dataset_, chunk_size=chunk_size)
+    writer.from_indexed_dataset(dataset_, chunksize=chunk_size)
 
 
 
