@@ -7,8 +7,8 @@ from torch.optim.lr_scheduler import MultiStepLR, ReduceLROnPlateau, LinearLR, C
 import pytorch_lightning as pl
 import torch.nn.functional as F 
 from torchmetrics import Accuracy 
-
-from efficient_training_neural_Nets.neural_nets_architecture.resnet import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
+from neural_nets_architecture.resnet import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
+#from efficient_training_neural_Nets.neural_nets_architecture.resnet import ResNet18, ResNet34, ResNet50, ResNet101, ResNet152
 
 def checkModel(dict, key): 
     """Checking Available ResNet Models"""
@@ -34,7 +34,7 @@ model_available={
     'resnet152': ResNet152,
 }
 
-class lightning_module(pl.LightningModule): 
+class lightning_model(pl.LightningModule): 
     def __init__(self, 
         backbone_architecture: str, 
         batch_size: int ,  

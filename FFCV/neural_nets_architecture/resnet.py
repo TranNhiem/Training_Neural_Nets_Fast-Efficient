@@ -89,7 +89,8 @@ class ResNet(nn.Module):
     # feat_scale lets us deal with CelebA, other non-32x32 datasets
     def __init__(self, block, num_blocks, num_classes=10, feat_scale=1, wm=1, m_transfer=True):
         super(ResNet, self).__init__()
-        if self.m_transfer: 
+        self.m_transfer= m_transfer
+        if m_transfer: 
             print("Implement m_transfer the Last FC layer")
 
         base_widths = [64, 128, 256, 512]
@@ -106,7 +107,9 @@ class ResNet(nn.Module):
         ## Standard Pytorch Linear layer
         self.fc = nn.Linear(widths[3]* block.expansion, num_classes)
         ### This is the only μP related change ###
+       
         self.linear = MuReadout(feat_scale*widths[3]*block.expansion, num_classes, readout_zero_init=True)
+        
         ###########################################
 
     def _make_layer(self, block, planes, num_blocks, stride):

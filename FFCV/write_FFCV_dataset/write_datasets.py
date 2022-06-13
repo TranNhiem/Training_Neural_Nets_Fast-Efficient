@@ -33,8 +33,8 @@ torchvision_dataset={
     "CIFAR10": datasets.CIFAR10,
 }
 
-def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_resolution: int, num_workers: int, 
-        chunk_size: int, subset: int, jpeg_quality: float, write_mode: str, compress_probability: float, torchvision_data: bool =False,
+def write_ffcv_DATA(dataset_dir: str, dataset_name: str, make_write_path: str, write_file_name: str, max_resolution: int, num_workers: int, 
+        chunk_size: int, subset: int, jpeg_quality: float, write_mode: str, compress_probability: float, torchvision_data: bool =False,data_mode: str ='train', 
         ): 
     '''
     args: 
@@ -54,15 +54,22 @@ def write_ffcv_DATA(dataset_dir: str, dataset_name: str, write_path: str, max_re
     '''
 
     if not os.path.isdir(dataset_dir):
-        print("creat : ", dataset_dir)
+        print("creating : ", dataset_dir)
         os.makedirs(dataset_dir)
-    # if not os.path.isdir(write_path):
-    #     print("creat : ", write_path)
-    #     os.makedirs(write_path)
+    if not os.path.isdir(make_write_path):
+        print("creating : ", make_write_path)
+        os.makedirs(make_write_path)
     
+    write_path= os.path.join(make_write_path,write_file_name)
+
     if torchvision_data:
         checkKey(torchvision_dataset, dataset_name)
-        dataset_=torchvision_dataset['dataset_name'](root=dataset_dir, )
+        if data_mode =="train": 
+            dataset_=torchvision_dataset[dataset_name](root=dataset_dir, train=True, download=True)
+        else: 
+            dataset_=torchvision_dataset[dataset_name](root=dataset_dir, train=False, download=True)
+        ### Future Continue Extend splitting capability for Splitting Dataset with DistributeSampler
+
     else: 
         dataset_= ImageFolder(root=dataset_dir)
 
@@ -84,7 +91,8 @@ if __name__=="__main__":
     ## Dataset Define
     parser.add_argument('--torchvision_data', type=str, default=True,)
     parser.add_argument('--dataset_name', type=str, default='CIFAR10')
-    parser.add_argument('--write_path', type=str, default='./FFCV_dataset/CIFAR10/')
+    parser.add_argument('--make_write_path', type=str, default='/img_data/FFCV_dataset/CIFAR/train/')
+    parser.add_argument('--write_file_name', type=str, default='cifar100.beton')
     parser.add_argument('--data_dir', type=str, default='./CIFAR10/')
     parser.add_argument('--write_mode', type=str, default='smart', help='Mode: raw, smart or jpg',)
     parser.add_argument('--img_size', type=int, default=32)
@@ -97,7 +105,7 @@ if __name__=="__main__":
     args = parser.parse_args() 
 
     print("Hoooray~~~ You are writing Test CIFAR10 dataset ")
-    write_ffcv_DATA(dataset_dir= args.data_dir, dataset_name=args.dataset_name, write_path=args.write_path, max_resolution=args.max_resolution, num_workers=args.num_workers, 
+    write_ffcv_DATA(dataset_dir= args.data_dir, dataset_name=args.dataset_name, make_write_path=args.make_write_path,write_file_name=args.make_write_path, max_resolution=args.max_resolution, num_workers=args.num_workers, 
         chunk_size=args.chunk_size, subset=args.subset, jpeg_quality=args.jpeg_quality, write_mode=args.write_mode, compress_probability=args.compress_probability, torchvision_data=args.orchvision_data,)
     print("Awesome~~~ Dataset completed --> Please check your folder")
     print("Directory as follow: ", args.data_dir)
