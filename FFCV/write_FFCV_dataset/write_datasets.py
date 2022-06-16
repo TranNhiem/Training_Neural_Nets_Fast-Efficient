@@ -90,7 +90,7 @@ if __name__=="__main__":
     parser= argparse.ArgumentParser()
     ## Dataset Define
     parser.add_argument('--torchvision_data', type=str, default=True,)
-    parser.add_argument('--dataset_name', type=str, default='CIFAR10')
+    parser.add_argument('--dataset_name', type=str, default='CIFAR100')
     parser.add_argument('--make_write_path', type=str, default='/img_data/FFCV_dataset/CIFAR/train/')
     parser.add_argument('--write_file_name', type=str, default='cifar100.beton')
     parser.add_argument('--data_dir', type=str, default='./CIFAR10/')

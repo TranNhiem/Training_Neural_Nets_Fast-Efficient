@@ -16,18 +16,18 @@ parser= argparse.ArgumentParser()
 ## Dataset Define
 parser.add_argument('--dataloader_type', type=str, default='ffcv', choices=['ffcv', 'others'], required=False)
 parser.add_argument('--dataset_name', type=str, default='CIFAR100')
-parser.add_argument('--dataset_mean', type=list, default=[125.307, 122.961, 113.8575])
-parser.add_argument('--dataset_std', type=list, default=[51.5865, 50.847, 51.255] )
+parser.add_argument('--dataset_mean', type=list, default=[125.307, 122.961, 113.8575])#None)#
+parser.add_argument('--dataset_std', type=list, default=[51.5865, 50.847, 51.255] )#None)#
 parser.add_argument('--dataset_length', type=int, default=50000, required=False)
 
-parser.add_argument('--num_classes', type=int, default=100)
-parser.add_argument('--data_path', type=str, default='/img_data/FFCV_dataset/CIFAR/')
+parser.add_argument('--num_classes', type=int, default=1000)
+parser.add_argument('--data_path', type=str, default='/img_data/')
 ## For ffcv dataset directory should be specify the correct name 
-parser.add_argument('--data_train_dir', type=str, default='/img_data/FFCV_dataset/CIFAR/train/cifar100.beton')
-parser.add_argument('--data_val_dir', type=str, default='/img_data/FFCV_dataset/CIFAR/val/cifar100.beton')
+parser.add_argument('--data_train_dir', type=str, default='/img_data/FFCV_dataset/CIFAR/train/cifar100.beton')#'/img_data/FFCV_dataset/ImageNet/train/ImageNet_train.beton')
+parser.add_argument('--data_val_dir', type=str, default='/img_data/FFCV_dataset/CIFAR/val/cifar100.beton')#'/img_data/FFCV_dataset/ImageNet/val/ImageNet_val.beton')
 
 parser.add_argument('--img_size', type=int, default=32)
-parser.add_argument('--batch_size', type=int, default=146)
+parser.add_argument('--batch_size', type=int, default=512)
 
 ## Training Hyperparameters
 parser.add_argument('--seed', type=int, default=100,help='random seed')
@@ -43,14 +43,14 @@ parser.add_argument('--momentum', type=float, default=0.9)
 
 parser.add_argument("--lr_scheduler",type= str, default="ConsineAnl_warmup",)# choices=['step', 'reduce_plateau', 'linear', 'cosineAnnealing', 'ConsineAnl_warmup'], help="learning rate schedule")
 parser.add_argument("--steps", type= list, default=[30, 50, 80, 120],  help="learning rate schedule")#[30,50,90, 120]
-parser.add_argument('--epochs', type=int, default=129)
-parser.add_argument('--num_workers', type=float, default=8)
-parser.add_argument('--gpus', type=list, default=[1])
+parser.add_argument('--epochs', type=int, default=100)
+parser.add_argument('--num_workers', type=float, default=32)
+parser.add_argument('--gpus', type=list, default=[0,1])
 
 
 
 ## Visualization and Debug Setting
-parser.add_argument("--method", type=str, default="FFCV_py_lightning")
+parser.add_argument("--method", type=str, default="ffcv_py_lightning")
 parser.add_argument("--job_type", type=str, default="Faster Training")
 args = parser.parse_args()
 
@@ -97,8 +97,8 @@ class Dataset_Trainer():
             img_size = self.img_size,
             batch_size = self.batch_size,
             num_workers = self.num_workers,
-            distributed=True, # Using DataParallel for multiple GPUs
-            fit_mem=False, # Cache all dataset into memory
+            distributed=False, # Using DataParallel for multiple GPUs
+            fit_mem=True, # Cache all dataset into memory
         )
 
         self.pl_model = lightning_model(
@@ -127,7 +127,7 @@ class Dataset_Trainer():
             offline = False,
         )
         callbacks_list=[]
-        self.wandb_logger.watch(self.pl_model, log="gradients",  log_freq = 50)
+        self.wandb_logger.watch(self.pl_model, log="epochs",  log_freq = 50)
         self.wandb_logger.log_hyperparams(args)
         # lr logging
         lr_monitor = LearningRateMonitor(logging_interval="step")
@@ -153,6 +153,7 @@ class Dataset_Trainer():
         print(f"Start Training : {self.dataset_name}")
         # for x, y in self.dataloader.train_dataloader(): 
         #     print(x.shape)
+        #     print(y.shape)
         self.trainer.fit(self.pl_model, self.dataloader)
 
         print("End Training")

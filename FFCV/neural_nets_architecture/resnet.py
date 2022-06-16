@@ -6,7 +6,7 @@ Reference:
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn import init
-
+import torch
 from mup import MuReadout
 
 class BasicBlock(nn.Module):
@@ -104,10 +104,12 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, widths[1], num_blocks[1], stride=2)
         self.layer3 = self._make_layer(block, widths[2], num_blocks[2], stride=2)
         self.layer4 = self._make_layer(block, widths[3], num_blocks[3], stride=2)
+        ## Standard AveragePooling2D 
+        self.avgpool= nn.AdaptiveAvgPool2d((1, 1))
         ## Standard Pytorch Linear layer
         self.fc = nn.Linear(widths[3]* block.expansion, num_classes)
         ### This is the only μP related change ###
-       
+     
         self.linear = MuReadout(feat_scale*widths[3]*block.expansion, num_classes, readout_zero_init=True)
         
         ###########################################
@@ -126,10 +128,13 @@ class ResNet(nn.Module):
         out = self.layer2(out)
         out = self.layer3(out)
         out = self.layer4(out)
-        out = F.avg_pool2d(out, 4)
-
-        pre_out = out.view(out.size(0), -1)
-
+        
+        out=self.avgpool(out)
+        #out = F.avg_pool2d(out, 4)
+        
+        pre_out = torch.flatten(out, 1)
+        #pre_out = out.view(out.size(0), -1)
+        #print(pre_out.shape)
         if self.m_transfer: 
             final = self.linear(pre_out)
         else: 

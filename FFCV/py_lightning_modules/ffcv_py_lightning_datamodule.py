@@ -16,7 +16,7 @@ from ffcv.transforms import ToDevice, ToTensor, ToTorchImage, Convert, RandomHor
 from ffcv.transforms.common import Squeeze
 from pathlib import Path
 from torch.utils.data import Subset
-
+from torchvision.datasets import ImageFolder
 torchvision_dataset={
     "CIFAR100": torchvision.datasets.CIFAR100, 
     "CIFAR10": torchvision.datasets.CIFAR10,
@@ -91,11 +91,12 @@ class FFCV_DataModule(pl.LightningDataModule):
         ## Label Data Pipeline
         label_pipeline: List[Operation]= [IntDecoder(), ToTensor(), ToDevice(device, non_blocking=True), Squeeze()]
         ## Image data Pipeline 
-        image_pipeline: List[Operation] = [SimpleRGBImageDecoder()]
+        image_pipeline: List[Operation] = []#[SimpleRGBImageDecoder()]
      
         image_pipeline.extend([
 
                                     #RandomResizedCropRGBImageDecoder((self.crop_size, self.crop_size), scale=(self.min_scale, self.max_scale)),
+                                    SimpleRGBImageDecoder()
                                     ToTensor(), 
                                     ToDevice(device, non_blocking=True), 
                                     ToTorchImage(),
@@ -103,7 +104,9 @@ class FFCV_DataModule(pl.LightningDataModule):
                                     #transforms.Resize( (self.img_size, self.img_size), InterpolationMode.BICUBIC),
                                     #transforms.Normalize(self.mean, self.std)
                                     #transforms.Normalize(CIFAR_MEAN, CIFAR_STD, type=np.float16)
-                                    NormalizeImage(mean=self.mean, std=self.std, type=np.float16)
+                                    #NormalizeImage(mean=self.mean, std=self.std,type=np.float32 )#type=np.float16)
+                                    Convert(torch.float16),
+                                    torchvision.transforms.Normalize(self.mean, self.std),
                                     ])
 
         return {"image": image_pipeline, "label": label_pipeline}
@@ -144,16 +147,16 @@ class FFCV_DataModule(pl.LightningDataModule):
         else: 
             
             data_path=os.path.join(self.data_path, mode)
-            dataset_= ImageFolder(data_path, transforms=self.dataset_transforms[mode])
+            dataset_= ImageFolder(data_path, transform=self.dataset_transforms[mode])
         
         if self.subset >0: dataset_=Subset(dataset_, range(subset))
         
 
         return torch.utils.data.DataLoader(
             dataset=dataset_,
-            batch_size= self.batch_size,
+            batch_size= 512,#self.batch_size,
             shuffle=True,
-            num_workers=self.num_workers,
+            num_workers=32,#self.num_workers,
             pin_memory=True,
         )
 
