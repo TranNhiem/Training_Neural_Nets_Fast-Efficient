@@ -31,7 +31,6 @@ def checkData(dict, key):
         return False
 
 
-
 class FFCV_DataModule(pl.LightningDataModule): 
 
     def __init__(self,
@@ -96,7 +95,7 @@ class FFCV_DataModule(pl.LightningDataModule):
         image_pipeline.extend([
 
                                     #RandomResizedCropRGBImageDecoder((self.crop_size, self.crop_size), scale=(self.min_scale, self.max_scale)),
-                                    SimpleRGBImageDecoder()
+                                    SimpleRGBImageDecoder(),
                                     ToTensor(), 
                                     ToDevice(device, non_blocking=True), 
                                     ToTorchImage(),

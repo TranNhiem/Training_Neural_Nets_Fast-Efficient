@@ -96,8 +96,8 @@ class lightning_model(pl.LightningModule):
         x, y = batch
         y_logits=self.forward(x)
         train_loss=F.cross_entropy(y_logits, y)
-        print("ground_truth", y[0])
-        print("prediction", y_logits[0].argmax(dim=-1))
+        # print("ground_truth", y[0])
+        # print("prediction", y_logits[0].argmax(dim=-1))
  
         if self.metric == 'Accuracy':   
             acc1= self.accuracy_1(y_logits, y)
